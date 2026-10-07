@@ -2,6 +2,24 @@ import numpy as np
 
 
 def hard_braking(ego_positions, timestamps, threshold=3.0):
+    positions = np.asarray(ego_positions, dtype=np.float64)
+    timestamps = np.asarray(timestamps, dtype=np.float64)
+
+    if len(positions) < 3:
+        return np.array([], dtype=int)
+
+    dt = np.diff(timestamps) / 1e6
+
+    if np.any(dt <= 0):
+        raise ValueError("timestamps must be strictly increasing")
+
+    dx = np.diff(positions[:, 0])
+    dy = np.diff(positions[:, 1])
+
+    velocity = np.hypot(dx, dy) / dt
+    acceleration = np.diff(velocity) / dt[1:]
+
+    return np.where(acceleration < -threshold)[0] + 2
     """
     Detect hard braking from ego-frame longitudinal position.
 

@@ -70,12 +70,12 @@ def search_similar(
     }
 
 
-@app.get("/mine/hard-braking/{scene}")
-def mine_hard_braking(
+@app.get("/scenarios/hard-braking/{scene}")
+def hard_braking_scenarios(
     scene: str,
     threshold: float = Query(3.0, gt=0),
 ):
-    df = samples[samples.scene == scene].sort_values("ts")
+    df = samples[samples.scene == scene].sort_values("ts").reset_index(drop=True)
 
     if df.empty:
         raise HTTPException(
@@ -83,11 +83,16 @@ def mine_hard_braking(
             detail="scene not found",
         )
 
-    positions = df[["ex", "ey"]].to_numpy(dtype=np.float64)
+    positions = np.column_stack([
+        df["ex"].to_numpy(dtype=np.float64),
+        df["ey"].to_numpy(dtype=np.float64),
+        np.zeros(len(df)),
+    ])
+
     timestamps = df["ts"].to_numpy(dtype=np.float64)
 
     events = hard_braking(
-        np.column_stack([positions, np.zeros(len(positions))]),
+        positions,
         timestamps,
         threshold,
     )
@@ -95,9 +100,10 @@ def mine_hard_braking(
     return {
         "scene": scene,
         "threshold": threshold,
+        "event_count": len(events),
         "events": [
             {
-                "sample_token": df.iloc[int(i)].sample_token,
+                "sample_token": str(df.iloc[int(i)].sample_token),
                 "timestamp": int(df.iloc[int(i)].ts),
                 "index": int(i),
             }
