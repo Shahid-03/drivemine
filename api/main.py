@@ -104,3 +104,27 @@ def mine_hard_braking(
             for i in events
         ],
     }
+
+
+@app.post("/scenarios/export")
+def export_scenario(
+    scene: str,
+    event_index: int = Query(..., ge=0),
+):
+    from sim.export import export_scenario as build_scenario
+
+    try:
+        path, scenario = build_scenario(
+            scene,
+            event_index,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+
+    return {
+        "path": path,
+        "scenario": scenario,
+    }
