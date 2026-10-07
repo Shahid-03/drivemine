@@ -1,0 +1,6 @@
+numpy: best=0.019850s mean=0.021252s events=84750
+cpp: best=0.014567s mean=0.014657s events=84750
+numpy_events=84750
+cpp_events=84750
+speedup=1.36x
+rows=5000000
