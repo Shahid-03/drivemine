@@ -2,10 +2,12 @@ import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import glob
+
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
-
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from embed.search import Searcher
 from miners.miners import hard_braking
 
@@ -14,7 +16,24 @@ app = FastAPI(
     description="Scenario mining API for autonomous driving logs",
     version="0.1.0",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+@app.get("/images/{image_path:path}")
+def get_image(image_path: str):
+    path = os.path.join("data/nuscenes", image_path)
 
+    if not os.path.isfile(path):
+        raise HTTPException(
+            status_code=404,
+            detail="image not found",
+        )
+
+    return FileResponse(path)
 searcher = Searcher()
 
 samples = pd.concat(
