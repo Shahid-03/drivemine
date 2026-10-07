@@ -1,0 +1,6 @@
+Endpoint: GET /search/text?q=night%20driving&k=5
+Requests: 20
+min: 14.7 ms
+mean: 55.9 ms
+p95: 67.5 ms
+Environment: Apple Silicon Mac, local FastAPI/Uvicorn
