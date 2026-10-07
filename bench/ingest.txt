@@ -1,0 +1,4 @@
+workers=1 samples=404 time=3.6s samples/s=113.2
+workers=2 samples=404 time=2.1s samples/s=193.3
+workers=4 samples=404 time=2.8s samples/s=144.1
+workers=8 samples=404 time=4.9s samples/s=82.3
